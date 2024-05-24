@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+:root {
+  --gradient_start: #001233;
+  --gradient_mid: #5676A7;
+  --gradient_end: #7EA4DE;
+}
+
+body {
+  background: linear-gradient(to right, var(--gradient_start), var(--gradient_mid) 77%, var(--gradient_end));
+  font-family: 'Roboto', sans-serif;
+}
