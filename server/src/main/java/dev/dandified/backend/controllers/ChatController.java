@@ -46,4 +46,22 @@ public class ChatController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    @DeleteMapping("/removeParticipant")
+    public ResponseEntity<Chat> removeParticipant(@RequestBody Map<String, String> payload) {
+        String chatId = payload.get("chatId");
+        String participantId = payload.get("participantId");
+
+        if (chatId == null || participantId == null) {
+            return ResponseEntity.badRequest().build(); // Return 400 Bad Request if payload is incomplete
+        }
+
+        Chat updatedChat = chatService.removeParticipant(chatId, participantId);
+        if (updatedChat == null) {
+            return ResponseEntity.notFound().build(); // Return 404 Not Found if the chat or participant is not found
+        }
+
+        return ResponseEntity.ok(updatedChat); // Return 200 OK with the updated chat
+    }
+
 }

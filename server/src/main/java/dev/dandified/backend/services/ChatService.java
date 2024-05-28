@@ -23,23 +23,34 @@ public class ChatService {
     private UserRepository userRepository;
     @Autowired
     private MongoTemplate mongoTemplate;
-    public List<Chat> allChats(){
+
+    public List<Chat> allChats() {
         return chatRepository.findAll();
     }
 
-    public Chat createChat(String name, String picture){
+    public Chat createChat(String name, String picture) {
         return chatRepository.insert(new Chat(name, LocalDate.now(), picture));
     }
 
-    public Chat addParticipants(String chatId, List<String> participantIds){
-        for (String participantId:
+    public Chat addParticipants(String chatId, List<String> participantIds) {
+        for (String participantId :
                 participantIds) {
-            Optional<User> participant =  userRepository.findById(participantId);
+            Optional<User> participant = userRepository.findById(participantId);
             mongoTemplate.update(Chat.class)
                     .matching(Criteria.where("id").is(chatId))
                     .apply(new Update().push("participantIds").value(participant.get()))
                     .first();
-            }
+        }
         return chatRepository.findById(chatId);
     }
+
+    public Chat removeParticipant(String chatId, String participantId) {
+        Optional<User> participant = userRepository.findById(participantId);
+        mongoTemplate.update(Chat.class)
+                .matching(Criteria.where("id").is(chatId))
+                .apply(new Update().pull("participantIds", participant.get()))
+                .first();
+        return chatRepository.findById(chatId);
+    }
+
 }
