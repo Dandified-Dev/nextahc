@@ -29,10 +29,10 @@ public class Chat {
     private LocalDate creationDate;
 
     @DocumentReference
-    private List<User> userIds;
+    private List<User> participantIds;
 
     @DocumentReference
-    private List<Message> messages;
+    private List<Message> messageIds;
     private String picture;
     private String string;
 

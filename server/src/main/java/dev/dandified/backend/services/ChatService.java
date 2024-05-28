@@ -1,5 +1,6 @@
 package dev.dandified.backend.services;
 
+import com.mongodb.client.result.UpdateResult;
 import dev.dandified.backend.models.Chat;
 import dev.dandified.backend.models.User;
 import dev.dandified.backend.repositories.ChatRepository;
@@ -32,14 +33,13 @@ public class ChatService {
 
     public Chat addParticipants(String chatId, List<String> participantIds){
         for (String participantId:
-             participantIds) {
-            System.out.println(participantId);
+                participantIds) {
             Optional<User> participant =  userRepository.findById(participantId);
             mongoTemplate.update(Chat.class)
                     .matching(Criteria.where("id").is(chatId))
-                    .apply(new Update().push("participantIds").value(participant))
+                    .apply(new Update().push("participantIds").value(participant.get()))
                     .first();
-        }
+            }
         return chatRepository.findById(chatId);
     }
 }
