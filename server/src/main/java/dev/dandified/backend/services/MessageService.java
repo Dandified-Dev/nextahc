@@ -1,5 +1,6 @@
 package dev.dandified.backend.services;
 
+import com.mongodb.client.result.UpdateResult;
 import dev.dandified.backend.models.Chat;
 import dev.dandified.backend.models.Message;
 import dev.dandified.backend.models.User;
@@ -9,11 +10,13 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -29,7 +32,7 @@ public class MessageService {
         return messageRepository.findAll();
     }
 
-    public Optional<Message> single(ObjectId id) {
+    public Optional<Message> single(String id) {
         return messageRepository.findById(id);
     }
 
@@ -46,4 +49,23 @@ public class MessageService {
 
         return message;
     }
+
+
+    public Message deleteMessage(String messageId) {
+        // Retrieve the message by ID and ensure it exists
+        return messageRepository.findById(messageId).map(message -> {
+            // Delete the message from the Message collection
+            mongoTemplate.remove(new Query(Criteria.where("id").is(new ObjectId(messageId))), Message.class);
+
+            // Remove the message ID from the messageIds array in the Chat documents
+            Query chatQuery = new Query(Criteria.where("messageIds").is(new ObjectId(messageId)));
+            Update update = new Update().pull("messageIds", new ObjectId(messageId)); // Use ObjectId here
+            UpdateResult result = mongoTemplate.updateMulti(chatQuery, update, Chat.class);
+
+            // Return the deleted message
+            return message;
+        }).orElseThrow(() -> new NoSuchElementException("Message not found with id: " + messageId));
+    }
+
+
 }

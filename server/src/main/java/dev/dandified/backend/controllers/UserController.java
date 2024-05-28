@@ -26,7 +26,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody Map<String, String> payload){
-        return new ResponseEntity<>(userService.createUser(payload.get("password"), payload.get("password"), payload.get("picture")), HttpStatus.CREATED);
+        return new ResponseEntity<>(userService.createUser(payload.get("password"), payload.get("password"), payload.get("picture                  ")), HttpStatus.CREATED);
 
     }
 }
